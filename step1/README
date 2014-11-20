@@ -1,0 +1,7 @@
+Road to a Cube: Step 1
+
+- Serve a webpage using pub
+- index.html with a canvas element
+- Access the canvas element in Dart
+- Create a WebGL rendering context
+- Clear the color and depth buffers

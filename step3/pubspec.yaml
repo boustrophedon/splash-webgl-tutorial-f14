@@ -1,0 +1,9 @@
+name: splash-webgl-tutorial-f14
+version: "0.0.3"
+description: webgl tutorial for splash fall 2014
+author: Harry Stern <harry.stern@rutgers.edu>
+homepage: 
+environment:
+  sdk: ">=1.2.0"
+dependencies:
+  browser: any

@@ -1,0 +1,6 @@
+Road to a Cube: Step 2
+
+- Import a local package
+- Access vertex and fragment shader code from script elements
+- Load and compile vertex and fragment shaders
+- Link together shaders to create a shader program

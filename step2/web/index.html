@@ -1,0 +1,29 @@
+<!doctype html>
+
+<html>
+  <head>
+	<title> Step 2 </title>
+
+    <script id="v2d-vertex-shader" type="x-shader/x-vertex">
+    attribute vec2 a_position;
+    void main() {
+       gl_Position = vec4(a_position, 0, 1);
+    }
+    </script>
+
+    <script id="f2d-fragment-shader" type="x-shader/x-fragment">
+    void main() {
+       gl_FragColor = vec4(0,1,0,1);  // green
+    }
+    </script>
+
+  </head>
+  <body>
+    <div id="container">
+      <canvas id="canvas-area"></canvas>
+    </div>
+    <script type="application/dart" src="main.dart"></script>
+    <script src="packages/browser/dart.js"></script>
+  </body>
+</html>
+

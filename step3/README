@@ -1,0 +1,7 @@
+Road to a Cube: Step 3
+
+- Create an array of 6 vertices forming two triangles that make a square
+- Create a buffer object
+- Bind the buffer object and send the array data into the object
+- Tell the gpu which glsl variable the array data goes into, and how the array data is structured
+- Draw the array data as triangles
