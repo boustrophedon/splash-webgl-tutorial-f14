@@ -6,7 +6,7 @@ import 'package:vector_math/vector_math.dart';
 
 import 'webgl_utils.dart';
 
-class SquareRenderer {
+class CubeRenderer {
   CanvasElement canvas;
   WebGL.RenderingContext gl;
 
@@ -21,19 +21,19 @@ class SquareRenderer {
   WebGL.UniformLocation mvMatrixLocation;
   WebGL.UniformLocation projectionMatrixLocation;
   
-  Float32List rect_data;
+  Float32List cube_data;
   Float32List color_data;
   Uint16List index_data;
 
-  WebGL.Buffer rectBuffer;
+  WebGL.Buffer cubeBuffer;
   WebGL.Buffer colorBuffer;
   WebGL.Buffer indexBuffer;
 
-  Matrix4 rect_model_matrix;
+  Matrix4 cube_model_matrix;
   Matrix4 view_matrix;
   Matrix4 projection_matrix;
 
-  SquareRenderer(CanvasElement canvas) {
+  CubeRenderer(CanvasElement canvas) {
     this.canvas = canvas;
     this.gl = canvas.getContext3d();
 
@@ -45,12 +45,13 @@ class SquareRenderer {
       print("Loaded canvas successfully!");
     }
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
+    gl.enable(WebGL.DEPTH_TEST);
   }
   void setup_shaders() {
     vertexShader = createShaderFromScriptElement(gl, "#v2d-vertex-shader");
-    print(gl.getShaderInfoLog(vertexShader));
+    //print(gl.getShaderInfoLog(vertexShader));
     fragmentShader = createShaderFromScriptElement(gl, "#f2d-fragment-shader");
-    print(gl.getShaderInfoLog(fragmentShader));
+    //print(gl.getShaderInfoLog(fragmentShader));
     program = createProgram(gl, [vertexShader, fragmentShader]);
 
     gl.useProgram(program);
@@ -72,44 +73,56 @@ class SquareRenderer {
   }
 
   void setup_buffers() {
-    setup_rect_buffer();
-    setup_rect_color_buffer();
-    setup_rect_index_buffer();
+    setup_cube_buffer();
+    setup_cube_color_buffer();
+    setup_cube_index_buffer();
   }
 
-  void setup_rect_buffer() {
-    // four vertices of the rectangle, with points (x,y)
+  void setup_cube_buffer() {
+    // 8 vertices of the cube, with points (x,y,z)
     // specified counterclockwise from the first quadrant
-    rect_data = new Float32List.fromList( [1.0, 1.0,
-                                          -1.0, 1.0,
-                                          -1.0,-1.0,
-                                           1.0,-1.0]);
+    cube_data = new Float32List.fromList([
+        1.0,  1.0,  1.0, // 0 through 4 front vertices counterclockwise
+        1.0, -1.0,  1.0, // 1
+       -1.0, -1.0,  1.0, // 2
+       -1.0,  1.0,  1.0, // 3 
+        1.0,  1.0, -1.0, // 4 through 7 back vertices counterclockwise
+        1.0, -1.0, -1.0, // 5
+       -1.0, -1.0, -1.0, // 6
+       -1.0,  1.0, -1.0, // 7
+    ]);
 
     // create a new buffer object, floating somewhere magically inside the graphics card
-    rectBuffer = gl.createBuffer();
+    cubeBuffer = gl.createBuffer();
 
     // tell opengl, hey, i'm going to be using that buffer object for array data
-    gl.bindBuffer(WebGL.RenderingContext.ARRAY_BUFFER, rectBuffer);
-    // send the rect data to the gpu. STATIC_DRAW gives the gpu a hint that the data isn't going to be changing a lot
-    // note that we don't use the rectBuffer variable in this call. we're sending the data to whatever buffer object is currently bound
+    gl.bindBuffer(WebGL.RenderingContext.ARRAY_BUFFER, cubeBuffer);
+    // send the cube data to the gpu. STATIC_DRAW gives the gpu a hint that the data isn't going to be changing a lot
+    // note that we don't use the cubeBuffer variable in this call. we're sending the data to whatever buffer object is currently bound
     // to ARRAY_BUFFER
-    gl.bufferDataTyped(WebGL.RenderingContext.ARRAY_BUFFER, rect_data, WebGL.RenderingContext.STATIC_DRAW);
+    gl.bufferDataTyped(WebGL.RenderingContext.ARRAY_BUFFER, cube_data, WebGL.RenderingContext.STATIC_DRAW);
   }
 
-  void bind_rect_buffer() {
-    gl.bindBuffer(WebGL.RenderingContext.ARRAY_BUFFER, rectBuffer);
+  void bind_cube_buffer() {
+    gl.bindBuffer(WebGL.RenderingContext.ARRAY_BUFFER, cubeBuffer);
       
     // tell opengl two things: 1) the currently bound buffer (ARRAY_BUFFER) is the data source for "a_position"
-    // 2) the buffer has two components per vertex, they are floats, we don't need our data normalized (i.e mapped from 0-255 to 0.0-1.0)
+    // 2) the buffer has three components per vertex, they are floats, we don't need our data normalized (i.e mapped from 0-255 to 0.0-1.0)
     //    and the data starts at the beginning of the array and there's no other data inbetween each vertex in the array
-    gl.vertexAttribPointer(positionLocation, 2, WebGL.RenderingContext.FLOAT, false, 0, 0);
+    gl.vertexAttribPointer(positionLocation, 3, WebGL.RenderingContext.FLOAT, false, 0, 0);
   }
 
-  void setup_rect_index_buffer() {
+  void setup_cube_index_buffer() {
     // note these indices specify the triangles' vertices counterclockwise; the order matters
     // you can change the order with gl.frontFace(WebGL.CCW or WebGL.CW)
-    index_data = new Uint16List.fromList( [0, 1, 2,
-                                           0, 2, 3]);
+    index_data = new Uint16List.fromList([
+         0, 1, 2,  0, 2, 3,  // Front face
+         4, 5, 6,  4, 6, 7,  // Back face
+         4, 5, 1,  4, 1, 0,  // Top face
+         7, 6, 2,  7, 2, 3,  // Bottom face
+         4, 0, 3,  4, 3, 7,  // Right face
+         1, 5, 6,  1, 6, 2   // Left face
+    ]);
 
     indexBuffer = gl.createBuffer();
     // note the ELEMENT_ARRAY_BUFFER here
@@ -117,21 +130,27 @@ class SquareRenderer {
     gl.bufferDataTyped(WebGL.RenderingContext.ELEMENT_ARRAY_BUFFER, index_data, WebGL.RenderingContext.STATIC_DRAW);
   }
 
-  void bind_rect_index_buffer() {
+  void bind_cube_index_buffer() {
     gl.bindBuffer(WebGL.RenderingContext.ELEMENT_ARRAY_BUFFER, indexBuffer);
   }
 
-  void setup_rect_color_buffer() {
+  void setup_cube_color_buffer() {
     // one color for each vertex
-    color_data = new Float32List.fromList( [0.0, 1.0, 0.0, 1.0,
+    color_data = new Float32List.fromList( [0.0, 1.0, 0.0, 1.0, // front 4 vertices
                                             1.0, 0.0, 0.0, 1.0,
                                             0.0, 0.0, 1.0, 1.0,
-                                            1.0, 1.0, 1.0, 1.0]);
+                                            1.0, 1.0, 1.0, 1.0,
+
+                                            1.0, 1.0, 1.0, 1.0, // back 4 vertices
+                                            0.0, 1.0, 0.0, 1.0,
+                                            0.0, 0.0, 1.0, 1.0,
+                                            1.0, 0.0, 0.0, 1.0]);
+
     colorBuffer = gl.createBuffer();
     gl.bindBuffer(WebGL.RenderingContext.ARRAY_BUFFER, colorBuffer);
     gl.bufferDataTyped(WebGL.RenderingContext.ARRAY_BUFFER, color_data, WebGL.RenderingContext.STATIC_DRAW);
   }
-  void bind_rect_color_buffer() {
+  void bind_cube_color_buffer() {
     gl.bindBuffer(WebGL.RenderingContext.ARRAY_BUFFER, colorBuffer);
     gl.vertexAttribPointer(colorLocation, 4, WebGL.RenderingContext.FLOAT, false, 0, 0);
   }
@@ -151,20 +170,22 @@ class SquareRenderer {
     Vector3 up_dir = new Vector3(0.0, 1.0, 0.0);
 
     view_matrix = makeViewMatrix(camera_pos, lookAt_dir, up_dir);
-    rect_model_matrix = new Matrix4.identity();
+    cube_model_matrix = new Matrix4.identity();
+    cube_model_matrix.rotateX(0.78);
+    cube_model_matrix.rotateY(0.39);
   }
 
   void set_matrix_uniforms() {
-    Matrix4 mvMatrix = view_matrix*rect_model_matrix; // order matters!
+    Matrix4 mvMatrix = view_matrix*cube_model_matrix; // order matters!
     gl.uniformMatrix4fv(mvMatrixLocation, false, mvMatrix.storage);
     gl.uniformMatrix4fv(projectionMatrixLocation, false, projection_matrix.storage);
   }
 
   void draw(num dt) {
     gl.clear(WebGL.COLOR_BUFFER_BIT | WebGL.DEPTH_BUFFER_BIT);
-    bind_rect_color_buffer();
-    bind_rect_buffer();
-    bind_rect_index_buffer();
+    bind_cube_color_buffer();
+    bind_cube_buffer();
+    bind_cube_index_buffer();
 
     set_matrices();
     set_matrix_uniforms();
@@ -188,6 +209,6 @@ void main() {
   canvas.height = 800;
   canvas.width = 800;
 
-  SquareRenderer r = new SquareRenderer(canvas);
+  CubeRenderer r = new CubeRenderer(canvas);
   r.start();
 }

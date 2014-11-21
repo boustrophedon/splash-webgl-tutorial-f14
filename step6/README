@@ -1,0 +1,10 @@
+Road to a Cube: Step 6
+
+- Change vertex shader to accept a vec3 rather than vec2
+- Change "rect" to "cube"
+- Enable depth testing
+- Write cube coords to the vertex buffer
+- Write cube indices to the index buffer
+- Add 4 more colors to the color buffer
+- Change vertexAttribPointer to use 3 floats at a time rather than 2
+- Add a rotation to the cube so we can see more than one face
