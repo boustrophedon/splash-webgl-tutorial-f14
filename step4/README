@@ -1,0 +1,5 @@
+Road to a Cube: Step 4 
+
+- Require vector_math package in pubspec
+- Move everything into a class
+- Use window.requestAnimationFrame to render at 60fps, rather than just once
