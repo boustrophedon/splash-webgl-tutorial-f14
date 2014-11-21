@@ -17,7 +17,7 @@ class SquareRenderer {
   int positionLocation;
 
   Float32List rect_data;
-  WebGL.Buffer rect_buffer;
+  WebGL.Buffer rectBuffer;
 
   SquareRenderer(CanvasElement canvas) {
     this.canvas = canvas;
@@ -53,18 +53,18 @@ class SquareRenderer {
                                                     0.5,  0.5]);
 
     // create a new buffer object, floating somewhere magically inside the graphics card
-    rect_buffer = gl.createBuffer();
+    rectBuffer = gl.createBuffer();
 
     // tell opengl, hey, i'm going to be using that buffer object for array data
-    gl.bindBuffer(WebGL.RenderingContext.ARRAY_BUFFER, rect_buffer);
+    gl.bindBuffer(WebGL.RenderingContext.ARRAY_BUFFER, rectBuffer);
     // send the rect data to the gpu. STATIC_DRAW gives the gpu a hint that the data isn't going to be changing a lot
-    // note that we don't use the rect_buffer variable in this call. we're sending the data to whatever buffer object is currently bound
+    // note that we don't use the rectBuffer variable in this call. we're sending the data to whatever buffer object is currently bound
     // to ARRAY_BUFFER
     gl.bufferDataTyped(WebGL.RenderingContext.ARRAY_BUFFER, rect_data, WebGL.RenderingContext.STATIC_DRAW);
   }
 
   void bind_rect_buffer() {
-    gl.bindBuffer(WebGL.RenderingContext.ARRAY_BUFFER, rect_buffer);
+    gl.bindBuffer(WebGL.RenderingContext.ARRAY_BUFFER, rectBuffer);
       
     // tell opengl we're using the positionLocation that we got above. this is the position that goes into the vertex shader 
     gl.enableVertexAttribArray(positionLocation);

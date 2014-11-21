@@ -1,0 +1,8 @@
+Road to a Cube: Step 5 
+
+- Write matrix code for camera and projection
+- Update shaders to do projection, take in color values
+- Update shader setup code to bind attributes and uniforms
+- Update buffer setup code to make an index buffer
+- Update buffer setup code to make a color buffer
+- Update draw call to draw indexed rectangle
