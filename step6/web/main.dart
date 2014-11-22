@@ -46,6 +46,9 @@ class CubeRenderer {
     }
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
     gl.enable(WebGL.DEPTH_TEST);
+
+    gl.enable(WebGL.CULL_FACE);
+    gl.cullFace(WebGL.BACK);
   }
   void setup_shaders() {
     vertexShader = createShaderFromScriptElement(gl, "#v3d-vertex-shader");
@@ -80,19 +83,21 @@ class CubeRenderer {
 
   void setup_cube_buffer() {
     // 8 vertices of the cube, with points (x,y,z)
-    // specified counterclockwise from the first quadrant
+    // specified counterclockwise
     // note that because we have only 8 vertices, rather than 4 distinct vertices for each face
     // we can only have one color per vertex. that is, the color at the corner of each face
     // is the same for all corners sharing a vertex
     cube_data = new Float32List.fromList([
-        1.0,  1.0,  1.0, // 0 through 4 front vertices counterclockwise
-        1.0, -1.0,  1.0, // 1
-       -1.0, -1.0,  1.0, // 2
-       -1.0,  1.0,  1.0, // 3 
-        1.0,  1.0, -1.0, // 4 through 7 back vertices counterclockwise
-        1.0, -1.0, -1.0, // 5
-       -1.0, -1.0, -1.0, // 6
-       -1.0,  1.0, -1.0, // 7
+      // front
+      -1.0, -1.0,  1.0, // 0
+       1.0, -1.0,  1.0, // 1
+       1.0,  1.0,  1.0, // 2
+      -1.0,  1.0,  1.0, // 3
+      // back
+      -1.0, -1.0, -1.0, // 4
+       1.0, -1.0, -1.0, // 5
+       1.0,  1.0, -1.0, // 6
+      -1.0,  1.0, -1.0, // 7
     ]);
 
     // create a new buffer object, floating somewhere magically inside the graphics card
@@ -119,12 +124,18 @@ class CubeRenderer {
     // note these indices specify the triangles' vertices counterclockwise; the order matters
     // you can change the order with gl.frontFace(WebGL.CCW or WebGL.CW)
     index_data = new Uint16List.fromList([
-         0, 1, 2,  0, 2, 3,  // Front face
-         4, 5, 6,  4, 6, 7,  // Back face
-         4, 5, 1,  4, 1, 0,  // Top face
-         7, 6, 2,  7, 2, 3,  // Bottom face
-         4, 0, 3,  4, 3, 7,  // Right face
-         1, 5, 6,  1, 6, 2   // Left face
+      0, 1, 2, // front
+      2, 3, 0,
+      3, 2, 6, // top
+      6, 7, 3,
+      7, 6, 5, // back
+      5, 4, 7,
+      4, 5, 1, // bottom
+      1, 0, 4,
+      4, 0, 3, // left
+      3, 7, 4,
+      1, 5, 6, // right
+      6, 2, 1,
     ]);
 
     indexBuffer = gl.createBuffer();

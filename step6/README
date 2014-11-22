@@ -3,6 +3,7 @@ Road to a Cube: Step 6
 - Change vertex shader to accept a vec3 rather than vec2
 - Change "rect" to "cube"
 - Enable depth testing
+- Enable backface culling
 - Write cube coords to the vertex buffer
 - Write cube indices to the index buffer
 - Add 4 more colors to the color buffer
