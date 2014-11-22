@@ -1,23 +1,30 @@
 import 'dart:html';
 import 'dart:web_gl' as WebGL;
 import 'dart:typed_data';
+import 'dart:math' as math;
 
 import 'package:vector_math/vector_math.dart';
 
 import 'webgl_utils.dart';
 
+// global rng
+math.Random rng = new math.Random();
+
 class Cube {
   Matrix4 model_matrix;
   num x_rotation = 0.0;
   num y_rotation = 0.0;
+  num x_speed, y_speed;
   num x,y,z;
 
   Cube(this.x, this.y, this.z) {
+    x_speed = rng.nextDouble()*math.PI;
+    y_speed = rng.nextDouble()*math.PI;
     model_matrix = new Matrix4.identity();
   }
   void update(num dt) {
-    x_rotation += (dt*0.001) % 3.14;
-    y_rotation += (dt*0.003) % 3.14;
+    x_rotation += (dt/1000*x_speed) % math.PI;
+    y_rotation += (dt/1000*y_speed) % math.PI;
     model_matrix.setRotationX(x_rotation);
     model_matrix.rotateY(y_rotation);
     model_matrix.setTranslationRaw(x,y,z);
