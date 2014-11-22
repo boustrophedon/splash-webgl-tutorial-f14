@@ -1,0 +1,5 @@
+This is a WebGL tutorial that I wrote to teach for Splash 2014. I have no idea how much we'll be able to go through in the two hours I have, but the "goal" is to draw a cube.
+
+It's structured in a series of steps, and most of the steps don't change too much. Most OpenGL or WebGL tutorials I've seen online try to start too quickly, either by shoving a lot of code in your face at once or hiding most of the actual OpenGL code in some helper libraries.
+
+Hopefully it goes well!
