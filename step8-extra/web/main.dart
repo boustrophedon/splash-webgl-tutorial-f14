@@ -21,6 +21,7 @@ class Cube {
     x_speed = rng.nextDouble()*math.PI;
     y_speed = rng.nextDouble()*math.PI;
     model_matrix = new Matrix4.identity();
+    model_matrix.setTranslationRaw(x,y,z);
   }
   void update(num dt) {
     x_rotation += (dt/1000*x_speed) % math.PI;
@@ -80,6 +81,8 @@ class CubeRenderer {
     cubes = new List<Cube>();
     add_cube(-2.0, 2.0, 0.0);
     add_cube(2.0, -1.0, 0.0);
+    add_cube(2.0, 0.0, -20.0);
+    add_cube(2.0, 1.0, 3.0);
   }
   
   void add_cube([num x, num y, num z]) {
