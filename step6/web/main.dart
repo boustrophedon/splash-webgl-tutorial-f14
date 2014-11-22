@@ -81,6 +81,9 @@ class CubeRenderer {
   void setup_cube_buffer() {
     // 8 vertices of the cube, with points (x,y,z)
     // specified counterclockwise from the first quadrant
+    // note that because we have only 8 vertices, rather than 4 distinct vertices for each face
+    // we can only have one color per vertex. that is, the color at the corner of each face
+    // is the same for all corners sharing a vertex
     cube_data = new Float32List.fromList([
         1.0,  1.0,  1.0, // 0 through 4 front vertices counterclockwise
         1.0, -1.0,  1.0, // 1
