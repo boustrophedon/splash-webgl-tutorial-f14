@@ -47,9 +47,9 @@ class SquareRenderer {
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
   }
   void setup_shaders() {
-    vertexShader = createShaderFromScriptElement(gl, "#v2d-vertex-shader");
+    vertexShader = createShaderFromScriptElement(gl, "#v3d-vertex-shader");
     print(gl.getShaderInfoLog(vertexShader));
-    fragmentShader = createShaderFromScriptElement(gl, "#f2d-fragment-shader");
+    fragmentShader = createShaderFromScriptElement(gl, "#f3d-fragment-shader");
     print(gl.getShaderInfoLog(fragmentShader));
     program = createProgram(gl, [vertexShader, fragmentShader]);
 
