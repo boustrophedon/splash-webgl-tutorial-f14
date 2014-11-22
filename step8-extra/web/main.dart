@@ -6,6 +6,24 @@ import 'package:vector_math/vector_math.dart';
 
 import 'webgl_utils.dart';
 
+class Cube {
+  Matrix4 model_matrix;
+  num x_rotation = 0.0;
+  num y_rotation = 0.0;
+  num x,y,z;
+
+  Cube(this.x, this.y, this.z) {
+    model_matrix = new Matrix4.identity();
+  }
+  void update(num dt) {
+    x_rotation += (dt*0.001) % 3.14;
+    y_rotation += (dt*0.003) % 3.14;
+    model_matrix.setRotationX(x_rotation);
+    model_matrix.rotateY(y_rotation);
+    model_matrix.setTranslationRaw(x,y,z);
+  }
+}
+
 class CubeRenderer {
   CanvasElement canvas;
   WebGL.RenderingContext gl;
@@ -29,15 +47,14 @@ class CubeRenderer {
   WebGL.Buffer colorBuffer;
   WebGL.Buffer indexBuffer;
 
-  Matrix4 cube_model_matrix;
   Matrix4 view_matrix;
   Matrix4 projection_matrix;
+
+  List<Cube> cubes;
 
   num dt = 0.0;
   num timestamp = 0.0;
 
-  num x_rotation = 0.0;
-  num y_rotation = 0.0;
 
   CubeRenderer(CanvasElement canvas) {
     this.canvas = canvas;
@@ -52,7 +69,19 @@ class CubeRenderer {
     }
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
     gl.enable(WebGL.DEPTH_TEST);
+
+    cubes = new List<Cube>();
+    add_cube(-2.0, 2.0, 0.0);
+    add_cube(2.0, -1.0, 0.0);
   }
+  
+  void add_cube([num x, num y, num z]) {
+    if (x == null) x = 0.0;
+    if (y == null) y = 0.0;
+    if (z == null) z = 0.0;
+    cubes.add(new Cube(x,y,z));
+  }
+
   void setup_shaders() {
     vertexShader = createShaderFromScriptElement(gl, "#v2d-vertex-shader");
     //print(gl.getShaderInfoLog(vertexShader));
@@ -175,13 +204,10 @@ class CubeRenderer {
     Vector3 up_dir = new Vector3(0.0, 1.0, 0.0);
 
     view_matrix = makeViewMatrix(camera_pos, lookAt_dir, up_dir);
-    cube_model_matrix = new Matrix4.identity();
-    cube_model_matrix.rotateX(x_rotation);
-    cube_model_matrix.rotateY(y_rotation);
   }
 
-  void set_matrix_uniforms() {
-    Matrix4 mvMatrix = view_matrix*cube_model_matrix; // order matters!
+  void set_matrix_uniforms(Matrix4 model_matrix) {
+    Matrix4 mvMatrix = view_matrix*model_matrix; // order matters!
     gl.uniformMatrix4fv(mvMatrixLocation, false, mvMatrix.storage);
     gl.uniformMatrix4fv(projectionMatrixLocation, false, projection_matrix.storage);
   }
@@ -190,21 +216,19 @@ class CubeRenderer {
     this.dt = timestamp - this.timestamp;
     this.timestamp = timestamp;
 
-    print(dt);
-    x_rotation += (dt*0.001) % 3.14;
-    y_rotation += (dt*0.003) % 3.14;
-
-
     gl.clear(WebGL.COLOR_BUFFER_BIT | WebGL.DEPTH_BUFFER_BIT);
     bind_cube_color_buffer();
     bind_cube_buffer();
     bind_cube_index_buffer();
 
-    set_matrices();
-    set_matrix_uniforms();
+    for (Cube cube in cubes) {
+      cube.update(dt);
+      set_matrices();
+      set_matrix_uniforms(cube.model_matrix);
 
-    // draw the triangles via indexed elements
-    gl.drawElements(WebGL.RenderingContext.TRIANGLES, index_data.length, WebGL.UNSIGNED_SHORT, 0); // index_data.length == 6
+      // draw the triangles via indexed elements
+      gl.drawElements(WebGL.RenderingContext.TRIANGLES, index_data.length, WebGL.UNSIGNED_SHORT, 0); // index_data.length == 6
+    }
 
     window.requestAnimationFrame(draw);
   }

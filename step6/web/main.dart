@@ -165,8 +165,8 @@ class CubeRenderer {
     projection_matrix = makePerspectiveMatrix(0.78, canvas.width/canvas.height, 1.0, 100.0);
 
     // both the projection matrix and the three vectors below do not need to be computed every frame
-    Vector3 camera_pos = new Vector3(0.0, 0.0, -10.0);
-    Vector3 lookAt_dir = new Vector3(0.0, 0.0, 1.0); // looking straight down the z axis
+    Vector3 camera_pos = new Vector3(0.0, 0.0, 10.0);
+    Vector3 lookAt_dir = new Vector3(0.0, 0.0, -1.0); // looking straight down the z axis
     Vector3 up_dir = new Vector3(0.0, 1.0, 0.0);
 
     view_matrix = makeViewMatrix(camera_pos, lookAt_dir, up_dir);
